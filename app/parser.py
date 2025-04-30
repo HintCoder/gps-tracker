@@ -3,7 +3,6 @@ import logging
 
 def parse_location_packet(data: bytes):
     try:
-        # Valida cabeçalho e rodapé
         if data[:2] != b'\x50\xF7' or data[-2:] != b'\x73\xC4':
             logging.warning("Invalid packet header or footer")
             return None
@@ -11,7 +10,6 @@ def parse_location_packet(data: bytes):
         device_id = data[2:8].hex().upper()
         msg_type = data[8]
 
-        # Tipo de mensagem precisa ser 0x02 (localização)
         if msg_type != 0x02:
             logging.info(f"Ignoring non-location packet from device {device_id}")
             return None
@@ -29,6 +27,8 @@ def parse_location_packet(data: bytes):
         ignition_on = bool(flags & (1 << 13))
         latitude = -latitude if flags & (1 << 12) else latitude
         longitude = -longitude if flags & (1 << 11) else longitude
+        
+        logging.info(f"Parsed packet from device {device_id}: lat={latitude}, lon={longitude}, speed={speed}, dir={direction}")
 
         return {
             "device_id": device_id,
