@@ -12,12 +12,17 @@ class GPSHandler(socketserver.BaseRequestHandler):
             
             if parsed:
                 db = SessionLocal()
-                #TODO: fazer com update
-                db.query(Location).filter(Location.device_id == parsed["device_id"]).delete()
-                db.add(Location(**parsed))
-                db.commit()
+                existing = db.query(Location).filter(Location.device_id == parsed["device_id"]).first()
+                
+                if not existing or parsed["timestamp"] > existing.timestamp:
+                    if existing:
+                        db.delete(existing)
+                    db.add(Location(**parsed))
+                    db.commit()
+                    logging.info(f"Saved location for device {parsed['device_id']}")
+                else:
+                    logging.info(f"Ignored historical packet for {parsed['device_id']} (timestamp older)")
                 db.close()
-                logging.info(f"Saved location for device {parsed['device_id']}")
             else:
                 logging.warning("Packet could not be parsed")
         except Exception as e:
