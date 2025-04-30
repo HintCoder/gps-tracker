@@ -1,7 +1,5 @@
 from app.parser import parse_location_packet
 
-# LAT = -21.01 / LON = -42.53 / SPEED = 60 / DIRECTION = 54.87
-# FLAGS: D600 → gps_fixed + ignition_on + latitude- + longitude-
 VALID_PACKET = "50F70A3F730000000266313672156F00000000000000000000D6003C014096500288F4D072BD73C4"
 
 def test_latitude_longitude_are_valid_ranges():
